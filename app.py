@@ -6,6 +6,7 @@ import sqlite3
 from tempfile import mkdtemp
 from sqlite3 import Error
 import pandas as pd
+from wtforms import Form, BooleanField, StringField, PasswordField, validators
 
 from app_helper import login_required
 
@@ -35,10 +36,11 @@ def register():
     if request.method=="POST":
 
         # Ensure username was submitted
+        
 
         # Ensure password was submitted
 
-        # ensure that the two passwords match
+        # Ensure that the two passwords match
 
         username=request.form.get("username")
         password=request.form.get("password")

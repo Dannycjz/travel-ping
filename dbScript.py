@@ -7,24 +7,23 @@ import pandas as pd
 db = sqlite3.connect('chess') 
 cursor = db.cursor()
 
-# cursor.execute('''
-#           CREATE TABLE IF NOT EXISTS users
-#           ([user_id] INTEGER PRIMARY KEY, [user_name] TEXT, 
-#           [password] TEXT)
-#           ''')
-    
-# # cursor.execute('''
-# #         INSERT INTO users (user_id, user_name, password)
-# #         VALUES
-# #         (1, 'Danny', '123'),
-# #         (2, 'Daniel', '456')
-# #         ''')
-
 cursor.execute('''
-                SELECT * FROM users
-                ''')
+          CREATE TABLE IF NOT EXISTS users
+          ([LastCall]INTEGER, [Latitude] REAL, [Longtitude] REAL, 
+          [Thumbs] INTEGER, [Tag] TEXT)
+          ''')
+    
+# cursor.execute('''
+#         INSERT INTO users (user_id, user_name, password)
+#         VALUES
+#         ([CURRENT TIME], '51', '-1', '1', 'tartanhack2022')
+#         ''')
 
-df=pd.DataFrame(cursor.fetchall(), columns=['user_id', 'user_name', 'password'])
+# cursor.execute('''
+#                 SELECT * FROM users
+#                 ''')
 
-# db.commit()
-print(df)
+# df=pd.DataFrame(cursor.fetchall(), columns=['LastCall', 'Latitude', 'Longtitude', 'Thumbs'])
+
+db.commit()
+# print(df)
