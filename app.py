@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, flash
 import sys
 from app_helper import login_required
 from flask_session import Session
@@ -8,7 +8,7 @@ from sqlite3 import Error
 import pandas as pd
 from wtforms import Form, BooleanField, StringField, PasswordField, validators
 
-from app_helper import login_required
+from app_helper import login_required, RegistrationForm, LoginForm
 
 app=Flask(__name__)
 
@@ -31,19 +31,14 @@ def register():
     
     # Forgets any existing userID
     session.clear()
+
+    form = RegistrationForm(request.form)
     
     # User reached route via POST
-    if request.method=="POST":
+    if request.method=="POST" and form.validate():
 
-        # Ensure username was submitted
-        
-
-        # Ensure password was submitted
-
-        # Ensure that the two passwords match
-
-        username=request.form.get("username")
-        password=request.form.get("password")
+        username=form.username.data
+        password=form.password.data
 
         script="INSERT INTO users (user_name, password) VALUES (?, ?)"
         values=(username, password)
@@ -55,7 +50,7 @@ def register():
         return redirect('/')
     # User reached route via GET
     else:
-        return render_template("register.html")
+        return render_template("register.html", form=form)
 
 @app.route('/login', methods=["GET", "POST"])
 # Logs the user in
@@ -67,34 +62,39 @@ def login():
     
     # Forget any current user_id
     session.clear()
+    
+    form = LoginForm(request.form)
+    error=None
 
     # User reached route via POST
     if request.method=="POST":
 
-        # Ensure username was submitted
-        
-        # Ensure password was submitted
+        password=form.password.data
 
         # Query database for username
         script="SELECT * FROM users WHERE user_name=?"
-        username=request.form.get("username")
+        username=form.username.data
         c.execute(script, [username])
 
         # Loads SQLite object into a dataframe
         df=pd.DataFrame(c.fetchall(), columns=['user_id', 'user_name', 'password'])
 
-        # Ensure username exists and password is correct 
+        if len(df)==0:
+            error = 'Invalid username'
+        else:
+            # Remember which user has logged in
+            user_data=df.loc[df['user_name']==username].values[0]
 
-        # Remember which user has logged in
-        user_data=df.loc[df['user_name']==username].values[0]
-        session["user_id"]=user_data[0]
-
-        # Redirect user to home page
-        return redirect("/")
+            # Ensure username exists and password is correct 
+            if user_data[2]!=password:
+                error = 'Invalid password'
+            else:
+                flash('You were successfully logged in')
+                session["user_id"]=user_data[0]
+                # Redirect user to home page
+                return redirect("/")
     
-    # User reached route via GET
-    else:
-        return render_template("login.html")
+    return render_template("login.html", form=form, error=error)
 
 @app.route("/logout")
 # Logs the user out
@@ -106,11 +106,7 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-@app.route("/lobby")
-@login_required
-# Renders the online lobby
-def lobby():
-    return render_template("lobby.html")
+
 
 if __name__=="__main__":
     app.run()
