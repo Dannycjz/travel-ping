@@ -27,38 +27,32 @@
       });
       // Initialize the map
       var map = L.map('map', {
-        layers: [world_street_map] // Default basemap
-      }).setView([8.7832, 34.5085], 3)
-      // Plot markers
-      // var geojsonLayer = new
-        L.GeoJSON.AJAX("world_population_2015.geojson");
-      // geojsonLayer.addTo(map);
-      // Plot circle markers
-      var geojsonLayer = new
-        L.GeoJSON.AJAX("world_population_2015.geojson", {
-          pointToLayer: function (feature, latlng) {
-            console.log(feature.properties);
-            return L.circleMarker(latlng, {
-              // Stroke properties
-              color: '#cc0000',
-              opacity: 0.75,
-              weight: 1,
-              // Fill properties
-              fillColor: '#cc0000',
-              fillOpacity: 0.6,
-              radius: feature.properties.pop_2015 / 7000000
-            });
-          }
-      }).addTo(map);
+        layers: [world_street_map], // Default basemap
+      }).setView([40.441, -79.945], 3)
+      map.setZoom(16);
 
-      var marker = L.marker([51.5, -0.09]).addTo(map);
-      var circle = L.circle([51.508, -0.11], {
+      var marker = L.marker([40.441, -79.945]).addTo(map);
+      var circle = L.circle([40.445, -79.945], {
         color: 'red',
         fillColor: '#f03',
         fillOpacity: 0.5,
-        radius: 500
+        radius: 200
       }).addTo(map);
+      marker.bindPopup("<b>New Event</b><br>A bulk of deers are here!<br><br><button>View Details</button>");
+    //   .openPopup();
+      circle.bindPopup("More dramas at <b>Tepper School of Business</b>");
+      var popup = L.popup();
+
+    function onMapClick(e) {
+    popup
+        .setLatLng(e.latlng)
+        .setContent("Did you discover something interesting here?<br><input type='text'></input><button>Submit</button>")
+        .openOn(map);
+        var marker2 = L.marker(e.latlng).addTo(map);
+        marker2.bindPopup("<b>New Event Reported By You</b><br>UC having free coffee<br><br><button>View Details</button>");
+
+      }
+    map.on('click', onMapClick);
 
     </script>
 {% endblock %}
-
